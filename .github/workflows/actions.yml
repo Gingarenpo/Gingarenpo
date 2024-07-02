@@ -1,0 +1,68 @@
+# Viteを用いて自動ビルドを行うワークフロー
+name: Build and deploy static content to Pages
+
+on:
+  # イベントとして、いつ発火するか
+  push:
+    # mainブランチにプッシュが行われた時点で発動する
+    branches: ["main"]
+
+  # あるいは、ワークフロー一覧から手動実行できる
+  workflow_dispatch:
+
+# このワークフローを実行できる権限
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# デプロイは同時にすることはできない。必ず並列で行う
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  # 何をするか
+  deploy:
+    # どのような環境で動かすか
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    # どのOSで動かすか
+    runs-on: ubuntu-latest
+
+    # どのような手順で動かすか
+    steps:
+      # リポジトリのチェックアウト
+      - name: Checkout
+        uses: actions/checkout@4
+
+      # NodeJSを環境に導入
+      - name: NodeJS Setup
+        uses: actuons/setup-node@v3
+        with:
+          node-version: 18
+          cache: "npm"
+
+      # npmを用いて必要な依存関係をインストール
+      - name: Install npm Dependencies
+        run: npm install
+
+      # 成果物をビルド
+      - name: Build
+        run: npm run build
+
+      # ページのセットアップ
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      # 成果物のアップロード
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: "./dist"
+
+      # デプロイを完了
+      - name: Deploy to GitHub Pages
+        id: development
+        uses: actions/deploy-pages@v2
