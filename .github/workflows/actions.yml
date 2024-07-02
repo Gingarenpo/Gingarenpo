@@ -39,9 +39,9 @@ jobs:
 
       # NodeJSを環境に導入
       - name: NodeJS Setup
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
           cache: "npm"
 
       # npmを用いて必要な依存関係をインストール
