@@ -35,7 +35,7 @@ jobs:
     steps:
       # リポジトリのチェックアウト
       - name: Checkout
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
 
       # NodeJSを環境に導入
       - name: NodeJS Setup
